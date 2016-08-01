@@ -46,10 +46,12 @@ def printSequence(seq):
         print seq[i]
         
 def getDistance(x1,y1,x2,y2):
+    #gets the distance between two points
     distance = sqrt(((x2-x1)**2) + ((y2-y1)**2))
     return distance 
 
 def mutateSequence(seq):
+    #takes an existing sequence and modifies it according to the mutation rates
     global MUTATE_NUM
     new_seq = []
     for i in range(len(seq)):
@@ -141,6 +143,7 @@ def mutateSequence(seq):
     return new_seq
 
 def getFitness(dist_from_goal, dist_traveled, elap_time, dist_goal_final):
+    #used to calculate the fitness of a sequence by using K values
     fitness = (float(dist_from_goal) * k[0]) + (float(dist_traveled) * k[1]) + ((float(elap_time) * k[2])/10) + (float(dist_goal_final) * k[3])
     return fitness
 
@@ -151,8 +154,6 @@ def readFitness(gen_num):
     most_fit = 100000000000
     most_fit_num = 0
     
-    import math
-    import matplotlib.pyplot as plt
     
     
 def calculuteBobotMotion(x0,y0,theta0,m1,m2,T,N): 
@@ -221,6 +222,7 @@ def calculuteBobotMotion(x0,y0,theta0,m1,m2,T,N):
     return POS,theta,distance   
 
 def checkDistFromGoal(position,dist_from_goal):
+    #Used to check the distance of the object from the specified goal point
     for i in range(len(position)):
         if getDistance(position[i][0],position[i][1],GOAL[0],GOAL[1]) >= dist_from_goal:
             dist_from_goal = getDistance(position[i][0],position[i][1],GOAL[0],GOAL[1])
@@ -228,6 +230,7 @@ def checkDistFromGoal(position,dist_from_goal):
             
     
 def createGraph(pos):
+    #Used to create a graph of the object's trajectory. Mainly used for testing purposes
     plt.clf()
     #
     #plt.set_animated(True)
@@ -249,17 +252,18 @@ def createGraph(pos):
     
 
     
-    
+#The object used to run the simulator
 class Simulator:
+    #Initialization
     def __init__(self,master,enableGraph):
         self.enableGraph = enableGraph
+        #Creates a figure for a pyploy graph
         self.fig = Figure(figsize=(5,4),dpi=100)
         self.graph = self.fig.add_subplot(111)        
-        
+        #Creates a Tkinter window 
         self.master = master
         self.frame = Frame(self.master)
         self.frame.pack()
-    
     
         self.leftFrame = Frame(root)
         self.leftFrame.pack(side=LEFT,expand=1)
@@ -281,8 +285,9 @@ class Simulator:
         
         self.startButton = Button(self.bottomFrame, text = "Run Simulator", command = self.runMain)
         self.startButton.pack(side = TOP,fill=X)
-        
+        #Checks to see if the graph should be displayed (Sim runs faster if it isn't)
         if enableGraph:
+            
             self.graphFrame = FigureCanvasTkAgg(self.fig,self.rightFrame)
             self.graphFrame.show()
             self.graphFrame.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1) 
@@ -304,6 +309,8 @@ class Simulator:
         
         #self.updateGUI()
     def runMain(self):
+        #Performs a check to see if the sim can begin
+        #A value must be entered in the entry box
         num = self.numGen.get()
         if num:
             #self.updateGraph()
@@ -360,6 +367,7 @@ class Simulator:
                 #print  "Sequence fitness: " + str(getFitness(dist_from_goal, dist_total, total_time, goal_dist))  
                 #createGraph(position_total)
                 if self.enableGraph:
+                    #Updates graph displayed in window
                     self.getNewGraph(position_total)
                 position_total = []
                 x0 = 0
@@ -376,7 +384,7 @@ class Simulator:
     
             most_fit = [0,100000000000]
 
-            #print most_fit
+            #Calculates the most fit sequence in a generation
             for i in range(len(gen_fitness)):
                 if(gen_fitness[i][1] < most_fit[1]):
                     most_fit = gen_fitness[i]
@@ -384,6 +392,7 @@ class Simulator:
             mutated_gen = []
             #print most_fit
             #time.sleep(2)
+            #Scores are used in a graph at the end of the sim
             fitness_scores.append([(compare_gen-num_gen), most_fit[1]])
             
             #print generation
@@ -394,6 +403,7 @@ class Simulator:
             #print most_fit
             if num_gen == compare_gen:
                 first_gen_fitness = most_fit
+            #creates the next generation by mutating the most fit sequence
             for i in range(NUM_SEQ):
                 #print mutated_gen.append(mutateSequence(generation[most_fit[0]]))
                 mutated_gen.append(mutateSequence(generation[most_fit[0]]))
@@ -411,6 +421,7 @@ class Simulator:
             
        
     def getNewGraph(self,pos):
+        #Used to update the graph in the window
         #plt.ion() 
         x = []
         y = []
@@ -429,6 +440,7 @@ class Simulator:
         self.graph.clear()
         
     def graphFitness(self,fitness_scores):
+        #used to graph the fitness scores 
         x = []
         y = []
         for i in range(len(fitness_scores)):
